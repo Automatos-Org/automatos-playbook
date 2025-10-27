@@ -1,0 +1,44 @@
+name: Notify Discord on Docs Updates
+
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - "docs/**"
+            - "CHANGELOG.md"
+
+permissions:
+    contents: read
+
+jobs:
+    notify:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Check commit message
+              id: check
+              run: |
+                  COMMIT_MSG=$(git log -1 --pretty=%s)
+                  if [[ "$COMMIT_MSG" == docs:* || "$COMMIT_MSG" == chore\(docs\):* ]]; then
+                    echo "should_notify=true" >> $GITHUB_OUTPUT
+                  else
+                    echo "should_notify=false" >> $GITHUB_OUTPUT
+                  fi
+
+            - name: Send Discord notification
+              if: steps.check.outputs.should_notify == 'true'
+              uses: tsickert/discord-webhook@v7.0.0
+              with:
+                  webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+                  username: Automatos Docs Bot
+                  avatar-url: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+                  content: |
+                      🚀 **New Documentation Update Published!**
+                      Repository: [${{ github.repository }}](https://github.com/${{ github.repository }})
+                      Commit: [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
+                      Author: **${{ github.actor }}**
+                      🔗 [View Latest Changelog](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md)
+                      _Keep your local standards in sync!_

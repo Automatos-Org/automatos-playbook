@@ -1,0 +1,13 @@
+title: Automatos Handbook
+description: Official company conventions and engineering standards
+theme: just-the-docs
+
+url: https://automatos-org.github.io/automatos-playbook
+baseurl: /automatos-handbook
+
+aux_links:
+  "Automatos GitHub":
+    - "https://github.com/automatos-org"
+
+color_scheme: dark
+search_enabled: true
